@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Checkers.Core\Checkers.Core.csproj" />
+    <ProjectReference Include="..\Checkers.EngineProtocol\Checkers.EngineProtocol.csproj" />
+  </ItemGroup>
+
+  <!--
+    The engine worker is a separate x64 exe started by the API (Engine:WorkerPath, default "worker\").
+    It is not a ProjectReference (that would mix x64 and AnyCPU); instead it is built alongside
+    and copied into a "worker" subfolder of the build output and of the publish output.
+  -->
+  <PropertyGroup>
+    <WorkerProject>..\Checkers.EngineWorker\Checkers.EngineWorker.csproj</WorkerProject>
+    <WorkerOutput>..\Checkers.EngineWorker\bin\$(Configuration)\$(TargetFramework)\</WorkerOutput>
+  </PropertyGroup>
+
+  <Target Name="BuildEngineWorker" AfterTargets="Build">
+    <MSBuild Projects="$(WorkerProject)" Targets="Build" Properties="Configuration=$(Configuration)" />
+    <ItemGroup>
+      <WorkerFiles Include="$(WorkerOutput)**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(WorkerFiles)" DestinationFolder="$(OutDir)worker\%(RecursiveDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="PublishEngineWorker" AfterTargets="Publish">
+    <ItemGroup>
+      <WorkerPublishFiles Include="$(WorkerOutput)**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(WorkerPublishFiles)" DestinationFolder="$(PublishDir)worker\%(RecursiveDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

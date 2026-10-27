@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Messages exchanged between Checkers.Api and Checkers.EngineWorker (JSON lines over stdin/stdout),
+       plus the parser for KingsRow's status line. Shared so both sides use the same types. -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

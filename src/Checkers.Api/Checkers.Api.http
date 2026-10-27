@@ -1,0 +1,46 @@
+@Checkers.Api_HostAddress = http://localhost:5085
+
+GET {{Checkers.Api_HostAddress}}/healthz
+Accept: application/json
+
+###
+
+# Midgame position from the spec
+POST {{Checkers.Api_HostAddress}}/v1/move/suggest
+Content-Type: application/json
+
+{
+  "gameId": "checkers-8x8",
+  "state": { "notation": "PDN", "position": "B:W18,19,22,25,27,28,30,32:B1,5,6,7,10,12,14,16" },
+  "level": "strong",
+  "limits": { "maxDepth": 18, "softTimeMs": 500, "hardTimeMs": 1200 }
+}
+
+###
+
+# Endgame database position (4 pieces): tablebaseHit = true
+POST {{Checkers.Api_HostAddress}}/v1/move/suggest
+Content-Type: application/json
+
+{
+  "gameId": "checkers-8x8",
+  "state": { "notation": "PDN", "position": "W:WK14,K27:B5,6" },
+  "level": "strong"
+}
+
+###
+
+# Invalid PDN -> 422
+POST {{Checkers.Api_HostAddress}}/v1/move/suggest
+Content-Type: application/json
+
+{ "state": { "notation": "PDN", "position": "B:W33:B1" } }
+
+###
+
+POST {{Checkers.Api_HostAddress}}/v1/move/validate
+Content-Type: application/json
+
+{ "position": "B:W18,19,22,25,27,28,30,32:B1,5,6,7,10,12,14,16", "move": "14x23" }
+
+###
